@@ -8,6 +8,7 @@
                  [ring/ring-defaults "0.1.2"]
                  [com.h2database/h2 "1.4.188"]
                  [org.clojure/java.jdbc "0.3.0"]
+                 [org.clojure/data.json "0.2.6"];json工具
                  [clj-tagsoup/clj-tagsoup "0.3.0" :exclusions [org.clojure/clojure]];htmltohiccp
                  ]
   :plugins [[lein-ring "0.8.13"]]

@@ -2,8 +2,11 @@
   (:use [hiccup.page :only [include-css html5 include-js]])
   (:require [clojure.java.jdbc :as jdbc]
             [ring.middleware.anti-forgery :as  anti-forgery]
+            [clojure.data.json :as json]
             )
   )
+(json/write-str [{:name "张三"} {:name "历史"}])
+
 (let [db-protocol "tcp"            ; "file|mem|tcp"
       db-host     "localhost" ; "path|host:port"
       db-name     "~/mm"]
@@ -45,6 +48,8 @@
           [:div "主很没变异 简aaa单页"]
           (showUserLst)
           ] ))
+
+;(auto-complete)
 ;表单字段
 (defn comp-field [field]
   [:input field]
@@ -67,7 +72,7 @@
     (print "==========" entity) 
     (list
       [:td [:label (:label mField)]] 
-      [:td [:input {:name (:name field) :type (:type mField) :value ((keyword (:name field)) entity) }]] )  
+      [:td [:input {:id (:name field) :name (:name field) :type (:type mField) :value ((keyword (:name field)) entity) }]] )  
     )
   )
 (defn tr [col entity]
@@ -89,8 +94,8 @@
      [:table
       [:td
        [:p
-        [:input {:type "submit" :value "保存" :class "btn btn-primary btn-lg"} ] 
-        [:input {:type "button" :value "取消" :class "btn btn-warning btn-lg"} ]
+        [:button {:type "submit", :class "btn btn-info"} [:i {:class "glyphicon glyphicon-refresh"}] " 保存"]
+        [:button {:type "submit", :class "btn btn-danger"} [:i {:class "glyphicon glyphicon-remove"}] " 删除"]
         ] 
        ]
       [:td
@@ -151,9 +156,14 @@
   )
 (defn comp-page
   [request]
-  (let [form (col3-form (with-meta (:params request) {:fields [{:name "name" :label "名称"} {:name "sex"} {:name "address"}]})) {entity :params} request]
+  (let [form (col3-form (with-meta (:params request) 
+                                   {:fields [
+                                             {:name "name" :label "用户名："} {:name "path" :label "全名："} {:name "password" :label "密码："}
+                                             {:name "email" :label "邮箱："} {:name "mobile" :label "手机："} {:name "qq" :label "QQ："}
+                                             {:name "sex" :label "性别："} {:name "address" :label "地址："}
+                                             ]})) {entity :params} request]
     (html5 [:head 
-            (include-css "/bootstrap/css/bootstrap.min.css" "/css/styles.css" "/css/buttons.css")
+            (include-css "/bootstrap/css/bootstrap.min.css" "/css/jquery-ui.css" "/css/styles.css" "/css/buttons.css")
             ]
            [:body
             comp-header 
@@ -162,10 +172,24 @@
               comp-left-menu 
               [:div.col-md-10
                (bt-form form)
-               ]
-              ] 
+               [:div.row
+                [:input {:id "testac" :type "text" :value ""} ]
+                [:input {:id "testac1" :type "text" :value "" } ]
+                ]]
+              ]
              ]
-            (include-js "/js/jquery.js" "/js/jquery-ui.js"  "/bootstrap/js/bootstrap.min.js" "js/custom.js")
+            (include-js "/js/jquery.js" "/js/jquery-ui.js"  "/bootstrap/js/bootstrap.min.js" "js/custom.js" "js/my-form.js")
+            [:script 
+             (str
+               "$(function(){"
+
+               "buildAutoComplete(" (json/write-str [{:name "a" :value "A" :label "MA脏"} {:name "b" :value "B" :label "MB"} {:name "c" :value "C"}]) "," (json/write-str {:valueField "name" :elementId "name"} ) ");"
+               "buildCategoryAutoComplete(" (json/write-str [{:name "a" :value "A" :label "MA脏" :category "ABC"} {:name "b" :value "B" :label "MB" :category "AB"} {:name "c" :value "C" :label "MC" :category "ABC"}]) "," (json/write-str {:valueField "name" :elementId "address"} ) ");"
+              "buildDatePicker('testac');" 
+
+               "});"
+               )
+             ]
             ]) 
     )
   )
@@ -186,7 +210,5 @@
 ;(parse "file:///z/workspace/clojure/b2/resources/public/temp.html")
 
 
-
-
-(seq '())
-(into [] '(2 4))
+(dotimes [x 10]  (prn x "a") )
+(for [x (range 10)] (prn x))
