@@ -6,8 +6,10 @@
                  [compojure "1.3.1"]
                  [ring-auth "0.1.0"]
                  [ring/ring-defaults "0.1.2"]
+                 ;;以下为数据库相关
                  [com.h2database/h2 "1.4.188"]
                  [org.clojure/java.jdbc "0.3.0"]
+                 [korma "0.4.0"]
                  [org.clojure/data.json "0.2.6"];json工具
                  [clj-tagsoup/clj-tagsoup "0.3.0" :exclusions [org.clojure/clojure]];htmltohiccp
                  ]

@@ -69,7 +69,6 @@
             })
 (defn td [field entity]
   (let [mField (merge {:type "text" :label "未定义"} field)]
-    (print "==========" entity) 
     (list
       [:td [:label (:label mField)]] 
       [:td [:input {:id (:name field) :name (:name field) :type (:type mField) :value ((keyword (:name field)) entity) }]] )  
@@ -83,7 +82,6 @@
       ((partial map #(tr % entity)))
       )
   )
-(time (html5 (row3-row [{:name ":name"} {:name ":sex"} {:name ":sex"} {:name ":sex"}] {})))
 ;3列的表单
 (defn col3-form [entity]
   [:form {:method "post" :action ""} 
@@ -99,16 +97,12 @@
         ] 
        ]
       [:td
-
        ]
       ]
-     
      ]
     ] 
    ]
   )
-(html5 
-(col3-form (with-meta {} {:fields [{:name ":name"} {:name "sex"} {:name "address"}]})))
 
 (defn bt-form [form]
   [:div.row
@@ -154,6 +148,19 @@
       [:ul {} [:li {} [:a {:shape "rect", :href "login.html"} "Login"]] 
        [:li {} [:a {:shape "rect", :href "signup.html"} "Signup"]]]]]]]
   )
+;对话框组件
+(defn comp-dlg
+  [elementId content]
+  [:div {:style "position:relative;width:170px;padding-right:30px"}
+   [:input {:style "width:100%" :type "text2" :name ":name" :value "了上"}
+    ]
+   [:button {:style "position:absolute; width:30px; height:25px;top:0px;right:0px;z-index:1;" :class "btn btn-danger"
+             :onclick (str "buildCategoryDlg('" elementId "')")} ]
+   [:div {:style "display:none" :id elementId} 
+    content
+    ]
+   ]
+  )
 (defn comp-page
   [request]
   (let [form (col3-form (with-meta (:params request) 
@@ -175,6 +182,8 @@
                [:div.row
                 [:input {:id "testac" :type "text" :value ""} ]
                 [:input {:id "testac1" :type "text" :value "" } ]
+                (comp-dlg "testDlg" "测试对话框哈勒")
+    
                 ]]
               ]
              ]
@@ -203,6 +212,7 @@
           [:form
            [:input {:type "text" :name ":name" :value "上"}]
            [:input {:type "submit" :value "btn"}]
+           
            ]
           ]
                     ))

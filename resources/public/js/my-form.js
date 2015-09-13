@@ -88,7 +88,31 @@ function buildDatePicker(elementId){
 	});
 }
 
-
+function buildCategoryDlg(elementId,config){
+	var dlgVar = elementId+"Dlg";	
+	if(!window[dlgVar]){
+		var dialog=$("#"+elementId).dialog({
+				autoOpen: false,
+				height: 300,
+				width: 350,
+				modal: true,
+				buttons: {
+					"Create an account": alert,
+					Cancel: function() {
+						//dialog.dialog( "close" );
+					}
+				},
+				close: function() {
+				//	form[ 0 ].reset();
+				//	allFields.removeClass( "ui-state-error" );
+		} }
+		);
+		window[dlgVar]=dialog;
+		window[dlgVar].dialog("open");
+	}else{
+		window[dlgVar].dialog("open");
+	}
+}
 
 //日期控件的中文语言包
 (function( factory ) {
