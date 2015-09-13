@@ -170,7 +170,8 @@
                                              {:name "sex" :label "性别："} {:name "address" :label "地址："}
                                              ]})) {entity :params} request]
     (html5 [:head 
-            (include-css "/bootstrap/css/bootstrap.min.css" "/css/jquery-ui.css" "/css/styles.css" "/css/buttons.css")
+            (include-css "/bootstrap/css/bootstrap.min.css" "/css/jquery-ui.css" "/css/styles.css" "/css/buttons.css" 
+                         "/vendors/wdTree/css/tree.css" )
             ]
            [:body
             comp-header 
@@ -182,12 +183,13 @@
                [:div.row
                 [:input {:id "testac" :type "text" :value ""} ]
                 [:input {:id "testac1" :type "text" :value "" } ]
-                (comp-dlg "testDlg" "测试对话框哈勒")
+                (comp-dlg "testDlg" [:div#testDlgTree "测试对话框哈勒"])
     
                 ]]
               ]
              ]
-            (include-js "/js/jquery.js" "/js/jquery-ui.js"  "/bootstrap/js/bootstrap.min.js" "js/custom.js" "js/my-form.js")
+            (include-js "/js/jquery.js" "/js/jquery-ui.js"  "/bootstrap/js/bootstrap.min.js" "js/custom.js" "js/my-form.js" 
+                        "/vendors/wdTree/src/Plugins/jquery.tree.js" "/vendors/wdTree/data/tree1.js")
             [:script 
              (str
                "$(function(){"
