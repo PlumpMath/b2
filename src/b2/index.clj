@@ -150,16 +150,17 @@
 ;对话框组件
 (defn comp-dlg
   [elementId content field entity]
-  [:div.field-comm {:style "position:relative;adding-right:30px"}
-            (include-css "/vendors/wdTree/css/tree.css")
-   [:input {:style "width:100%" :type "text2" :name (:name field) :value ((keyword (:name field)) entity) :id (:name field)}
-    ]
-   [:button {:style "position:absolute; width:30px; height:25px;top:0px;right:0px;z-index:1;" :class "btn btn-danger"
-             :onclick (str "buildSingleSelectTreeField('" (:name field) "',treedata);return false") :type "button" :role "button"} ]
-   [:div {:style "display:none" :id elementId :title "测试"} 
-    content
-    ]
-   ]
+  (let [data (:data field [])]
+    [:div.field-comm {:style "position:relative;adding-right:20px"}
+     (include-css "/vendors/wdTree/css/tree.css")
+     [:input {:style "width:100%" :type "text2" :name (:name field) :value ((keyword (:name field)) entity) :id (:name field)}
+      ]
+     [:button {:style "position:absolute; width:0px; height:25px;top:0px;right:0px;z-index:1;" :class "btn btn-danger"
+               :onclick (str "buildSingleSelectTreeField('" (:name field) "'," (json/write-str data) ");return false") :type "button" :role "button"} ]
+     [:div {:style "display:none" :id elementId :title "测试"} 
+      content
+      ]
+     ])
   )
 ;树对话框字段
 (defn field-tree-dlg
@@ -178,37 +179,44 @@
     [:option {:value "中"} "hahah"] 
    ]
   )
-(defn field-radio
+(defn field-autocomplete
   [field entity]
-  [:div
-   [:label 
-    [:input {:type "radio" :name "a" :value "abc" }]
-    "懂le ma "]
-   [:label 
-    [:input {:type "radio" :name "a" :value "b" :checked "true"}]
-    "AA张三李四"][:label 
-    [:input {:type "radio" :name "a" :value "d"}]
-    "AA"][:label 
-    [:input {:type "radio" :name "a" :value "c"}]
-    "AA"]
-   ]
+  (let [data (:data field []) ]
+    [:input.field-comm {:id (:name field) :name (:name field) :type "text" :value ((keyword (:name field)) entity) :onfocus (str  "buildAutoComplete(" (json/write-str data)  ",'" (:name field) "')")}]
+    ))
+;单选按钮组，选项数据来自field的:data选项,数组类型
+(defn field-radio
+  ([field entity]
+  (let [data (:data field [])]
+    (reduce #(conj % (field-radio field entity %2)) [:div] data)  
+    ))
+    ([field entity item]
+     [:label {:style "padding-left:5px"}
+      [:input {:type "radio" :name (:name field) :value item :checked (= item ((keyword (:name field)) entity)) }]
+      item] 
+    )
   )
-
+(let [field {:name "name"} entity {:name "zs"} data ["zs" "ls"]]
+(reduce #(conj % (field-radio field entity %2)) [:div] data))
+(field-radio {:name "name" :data ["zs" "ls"]} {:name "zs"})
 
 (defn field-password
  [field entity] 
   )
 (defn field-datepicker
  [field entity] 
+  [:input.field-comm {:id (:name field) :name (:name field) :type "text" :value ((keyword (:name field)) entity) :onfocus (str  "buildDatePicker('"  (:name field) "')")}]
   )
-
+;数节点模型模板，id必须为string类型
+(def nodeTemplate {:id "0",:text "root",:value "86",:showcheck true,:complete true,:isexpand true ,:checkstate  0 ,:hasChildren true})
+(def departmentTree [(merge nodeTemplate {:ChildNodes [(merge nodeTemplate {:id "1" :text "软件部" :hasChildren false })] :text "所有部门"})])
 (defn comp-page
   [request]
   (let [form (col3-form (with-meta (:params request) 
                                    {:fields [
-                                             {:name "name" :label "用户名："} {:name "path" :label "全名：" :render field-radio} {:name "password" :label "密码："}
-                                             {:name "email" :label "邮箱：" :render field-option } {:name "mobile" :label "手机："} {:name "qq" :label "QQ："}
-                                             {:name "sex" :label "性别：" :render field-tree-dlg} {:name "address" :label "地址："  }
+                                             {:name "name" :label "用户名：" :render field-autocomplete :data [{:name "a" :value "儿童票" :label "儿童票(80元)"} {:name "b" :value "B" :label "MB"} {:name "c" :value "C"}]} {:name "path" :label "全名：" :data ["男" "女"] :render field-radio} {:name "password" :label "密码："}
+                                             {:name "email" :label "邮箱：" :render field-option } {:name "mobile" :label "手机：" :render field-datepicker} {:name "qq" :label "QQ："}
+                                             {:name "sex" :label "性别：" :render field-tree-dlg :data departmentTree} {:name "address" :label "地址："  }
                                              ]})) {entity :params} request]
     (html5 [:head 
             (include-css "/bootstrap/css/bootstrap.min.css" "/css/jquery-ui.css" "/css/styles.css" "/css/buttons.css" 
@@ -221,9 +229,6 @@
               [:div.col-md-10
                (bt-form form)
                [:div.row
-                [:input {:id "testac" :type "text" :value ""} ]
-                [:input {:id "testac1" :type "text" :value "" } ]
-                (field-tree-dlg {:name "department"} {:department "财务"})
                 ]]
               ]
              ]
@@ -233,9 +238,7 @@
              (str
                "$(function(){"
 
-               "buildAutoComplete(" (json/write-str [{:name "a" :value "A" :label "MA脏"} {:name "b" :value "B" :label "MB"} {:name "c" :value "C"}]) "," (json/write-str {:valueField "name" :elementId "name"} ) ");"
                "buildCategoryAutoComplete(" (json/write-str [{:name "a" :value "A" :label "MA脏" :category "ABC"} {:name "b" :value "B" :label "MB" :category "AB"} {:name "c" :value "C" :label "MC" :category "ABC"}]) "," (json/write-str {:valueField "name" :elementId "address"} ) ");"
-              "buildDatePicker('testac');" 
 
                "});"
                )

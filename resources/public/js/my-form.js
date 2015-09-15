@@ -9,17 +9,17 @@
  *	|valueField:值字段名称,必须
  *	|elementId : 组件的HTML元素id，必须
  */
-function buildAutoComplete(items,field){
-	var elementId ="#"+ field["elementId"];
+function buildAutoComplete(items,fieldName){
+	var elementId ="#"+ fieldName;
 	$(elementId).autocomplete({
 			minLength: 0,
 			source: items,
 			focus: function( event, ui ) {
-				$(elementId).val( ui.item[field["valueField"]] );
+				$(elementId).val( ui.item["value"] );
 				return false;
 			},
 			select: function( event, ui ) {
-				$(elementId).val( ui.item[field["valueField"]] );
+				$(elementId).val( ui.item["value"] );
 				return false;
 			},
 	})
@@ -81,11 +81,10 @@ $.widget( "custom.catcomplete", $.ui.autocomplete, {
 
 function buildDatePicker(elementId){
 	var eId = "#"+elementId;
-	$( eId ).datepicker( $.datepicker.regional[ "zh-TW" ] );
-	$( "#locale" ).change(function() {
-		$( eId ).datepicker( "option",
-			$.datepicker.regional[ $( this ).val() ] );
-	});
+	if(!window[elementId+"DatePicker"]){
+	   window[elementId+"DatePicker"]=$( eId ).datepicker( $.datepicker.regional[ "zh-TW" ] );
+		 window[elementId+"DatePicker"].datepicker("show");
+	}
 }
 /**
  * 构建弹出式树状选择字段，
