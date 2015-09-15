@@ -67,11 +67,13 @@
             :method "GET"
             :action ""
             })
+
 (defn td [field entity]
-  (let [mField (merge {:type "text" :label "未定义"} field)]
+  (let [mField (merge {:type "text" :label "未定义" :render field-text} field)]
     (list
-      [:td [:label (:label mField)]] 
-      [:td [:input {:id (:name field) :name (:name field) :type (:type mField) :value ((keyword (:name field)) entity) }]] )  
+      [:td {:style "text-align:right"} [:label (:label mField)]] 
+      [:td ((:render mField) field entity)] 
+      )  
     )
   )
 (defn tr [col entity]
@@ -97,13 +99,8 @@
         ] 
        ]
       [:td
-       ]
-      ]
-     ]
-    ] 
-   ]
-  )
-
+       ]]]]])
+;bootstrap表单
 (defn bt-form [form]
   [:div.row
    [:div {:class "col-md-12 panel-info"} 
@@ -142,37 +139,80 @@
               [:i {:class "glyphicon glyphicon-stats"}] " Statistics (Charts)"]]
      [:li {} [:a {:shape "rect", :href "tables.html"} [:i {:class "glyphicon glyphicon-list"}] " Tables"]] 
      [:li {} [:a {:shape "rect", :href "buttons.html"} [:i {:class "glyphicon glyphicon-record"}] " Buttons"]] 
-     [:li {} [:a {:shape "rect", :href "editors.html"} [:i {:class "glyphicon glyphicon-pencil"}] " 案件查询"]] 
-     [:li {} [:a {:shape "rect", :href "forms.html"} [:i {:class "glyphicon glyphicon-tasks"}] " 案件登记"]] 
+     [:li {} [:a {:shape "rect", :href "editors.html"} [:i {:class "glyphicon glyphicon-pencil"}] " 添加用户"]] 
+     [:li {} [:a {:shape "rect", :href "forms.html"} [:i {:class "glyphicon glyphicon-tasks"}] " 查询用户"]] 
      [:li {:class "submenu"} [:a {:shape "rect", :href "#"} [:i {:class "glyphicon glyphicon-list"}] "报表统计" [:span {:class "caret pull-right"}]] 
       [:ul {} [:li {} [:a {:shape "rect", :href "login.html"} "Login"]] 
        [:li {} [:a {:shape "rect", :href "signup.html"} "Signup"]]]]]]]
   )
+
+
 ;对话框组件
 (defn comp-dlg
-  [elementId content]
-  [:div {:style "position:relative;width:170px;padding-right:30px"}
-   [:input {:style "width:100%" :type "text2" :name ":name" :value "了上"}
+  [elementId content field entity]
+  [:div.field-comm {:style "position:relative;adding-right:30px"}
+            (include-css "/vendors/wdTree/css/tree.css")
+   [:input {:style "width:100%" :type "text2" :name (:name field) :value ((keyword (:name field)) entity) :id (:name field)}
     ]
    [:button {:style "position:absolute; width:30px; height:25px;top:0px;right:0px;z-index:1;" :class "btn btn-danger"
-             :onclick (str "buildCategoryDlg('" elementId "')")} ]
-   [:div {:style "display:none" :id elementId} 
+             :onclick (str "buildSingleSelectTreeField('" (:name field) "',treedata);return false") :type "button" :role "button"} ]
+   [:div {:style "display:none" :id elementId :title "测试"} 
     content
     ]
    ]
   )
+;树对话框字段
+(defn field-tree-dlg
+  [field entity]
+  (let [elementId (str (:name field) "Dlg")]
+  (comp-dlg elementId  [:div {:id (str elementId "Tree")}  "测试对话框哈勒"] field entity))
+  )
+(defn field-text
+ [field entity] 
+  [:input.field-comm {:id (:name field) :name (:name field) :type "text" :value ((keyword (:name field)) entity) :style ""}]
+  )
+(defn field-option
+  [field entity]
+  [:select.field-comm {:id (:name field) :name (:name field)}
+    [:option {:value "hahah"} "hahd总ah"] 
+    [:option {:value "中"} "hahah"] 
+   ]
+  )
+(defn field-radio
+  [field entity]
+  [:div
+   [:label 
+    [:input {:type "radio" :name "a" :value "abc" }]
+    "懂le ma "]
+   [:label 
+    [:input {:type "radio" :name "a" :value "b" :checked "true"}]
+    "AA张三李四"][:label 
+    [:input {:type "radio" :name "a" :value "d"}]
+    "AA"][:label 
+    [:input {:type "radio" :name "a" :value "c"}]
+    "AA"]
+   ]
+  )
+
+
+(defn field-password
+ [field entity] 
+  )
+(defn field-datepicker
+ [field entity] 
+  )
+
 (defn comp-page
   [request]
   (let [form (col3-form (with-meta (:params request) 
                                    {:fields [
-                                             {:name "name" :label "用户名："} {:name "path" :label "全名："} {:name "password" :label "密码："}
-                                             {:name "email" :label "邮箱："} {:name "mobile" :label "手机："} {:name "qq" :label "QQ："}
-                                             {:name "sex" :label "性别："} {:name "address" :label "地址："}
+                                             {:name "name" :label "用户名："} {:name "path" :label "全名：" :render field-radio} {:name "password" :label "密码："}
+                                             {:name "email" :label "邮箱：" :render field-option } {:name "mobile" :label "手机："} {:name "qq" :label "QQ："}
+                                             {:name "sex" :label "性别：" :render field-tree-dlg} {:name "address" :label "地址："  }
                                              ]})) {entity :params} request]
     (html5 [:head 
             (include-css "/bootstrap/css/bootstrap.min.css" "/css/jquery-ui.css" "/css/styles.css" "/css/buttons.css" 
-                         "/vendors/wdTree/css/tree.css" )
-            ]
+                         "/css/my-form.css")]
            [:body
             comp-header 
             [:div.page-content
@@ -183,8 +223,7 @@
                [:div.row
                 [:input {:id "testac" :type "text" :value ""} ]
                 [:input {:id "testac1" :type "text" :value "" } ]
-                (comp-dlg "testDlg" [:div#testDlgTree "测试对话框哈勒"])
-    
+                (field-tree-dlg {:name "department"} {:department "财务"})
                 ]]
               ]
              ]
@@ -222,5 +261,4 @@
 ;(parse "file:///z/workspace/clojure/b2/resources/public/temp.html")
 
 
-(dotimes [x 10]  (prn x "a") )
-(for [x (range 10)] (prn x))
+

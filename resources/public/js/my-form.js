@@ -87,19 +87,62 @@ function buildDatePicker(elementId){
 			$.datepicker.regional[ $( this ).val() ] );
 	});
 }
+/**
+ * 构建弹出式树状选择字段，
+ *@fieldName :字段名称
+ *@data  : 树状菜单数据
+ */
+function buildSingleSelectTreeField(fieldName,data){
+	var config={
+		"data" : data,
+		showcheck : false,
+		"fieldId" : fieldName 
+	}
+	buildCategoryDlg(fieldName+"Dlg",config);
+}
+function buildMultiSelectTreeDlg(elementId,data){
+	var config={
+		"data" : data,
+		showcheck : true
+	}
+	buildCategoryDlg(elementId,config);
+}
+
 
 function buildCategoryDlg(elementId,config){
+	var dfop ={
+		showcheck : false
+	};
+	$.extend(dfop, config);
 	var dlgVar = elementId+"Dlg";	
 	if(!window[dlgVar]){
 		var dialog=$("#"+elementId).dialog({
 				autoOpen: false,
-				height: 300,
-				width: 350,
+				height: 400,
+				width: 400,
 				modal: true,
 				buttons: {
-					"Create an account": alert,
-					Cancel: function() {
-						//dialog.dialog( "close" );
+					"选择": function(){
+						if(dfop.showcheck){//多选
+							var s=$("#"+elementId+"Tree").getCheckedNodes();
+							if(s !=null)
+								alert(s.join(","));
+							else
+								alert("NULL");
+						}else{
+							//单选
+							var s=$("#"+elementId+"Tree").getCurrentNode();
+							if(s !=null){
+								//alert(s.text);
+								$("#"+config["fieldId"]).val(s.text);
+							}else{
+								alert("NULL");}
+							dialog.dialog( "close" );
+						}
+
+					},
+					"关闭": function() {
+						dialog.dialog( "close" );
 					}
 				},
 				close: function() {
@@ -114,10 +157,10 @@ function buildCategoryDlg(elementId,config){
 		$.browser.msie7 = $.browser.msie && /msie 7\.0/i.test(userAgent);
 		$.browser.msie6 = !$.browser.msie8 && !$.browser.msie7 && $.browser.msie && /msie 6\.0/i.test(userAgent);
 		function load() {        
-			var o = { showcheck: true
+			var o = { showcheck:dfop.showcheck 
 				//onnodeclick:function(item){alert(item.text);},        
 			};
-			o.data = treedata;                  
+			o.data = config["data"];                  
 			$("#"+elementId+"Tree").treeview(o);            
 			$("#showchecked").click(function(e){
 				var s=$("#tree").getCheckedNodes();
