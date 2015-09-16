@@ -68,6 +68,12 @@
             :action ""
             })
 
+(defn field-text
+ [field entity] 
+  [:input.field-comm {:id (:name field) :name (:name field) :type "text" :value ((keyword (:name field)) entity) :style ""}]
+  )
+
+
 (defn td [field entity]
   (let [mField (merge {:type "text" :label "未定义" :render field-text} field)]
     (list
@@ -112,6 +118,8 @@
       [:div {:class "row"} 
        form
        ]]]]
+   (include-js   "js/my-form.js" 
+                        "/vendors/wdTree/src/Plugins/jquery.tree.js" "/vendors/wdTree/data/tree1.js")
    ]
   )
 ;标题栏
@@ -168,10 +176,7 @@
   (let [elementId (str (:name field) "Dlg")]
   (comp-dlg elementId  [:div {:id (str elementId "Tree")}  "测试对话框哈勒"] field entity))
   )
-(defn field-text
- [field entity] 
-  [:input.field-comm {:id (:name field) :name (:name field) :type "text" :value ((keyword (:name field)) entity) :style ""}]
-  )
+
 (defn field-option
   [field entity]
   [:select.field-comm {:id (:name field) :name (:name field)}
@@ -196,9 +201,6 @@
       item] 
     )
   )
-(let [field {:name "name"} entity {:name "zs"} data ["zs" "ls"]]
-(reduce #(conj % (field-radio field entity %2)) [:div] data))
-(field-radio {:name "name" :data ["zs" "ls"]} {:name "zs"})
 
 (defn field-password
  [field entity] 
@@ -207,8 +209,21 @@
  [field entity] 
   [:input.field-comm {:id (:name field) :name (:name field) :type "text" :value ((keyword (:name field)) entity) :onfocus (str  "buildDatePicker('"  (:name field) "')")}]
   )
+(defn comp-list-page
+  []
+  [:div 
+   (include-css "/vendors/jqGrid/css/ui.jqgrid.css")
+   (include-js  "/vendors/jqGrid/js/i18n/grid.locale-cn.js" "/vendors/jqGrid/js/jquery.jqGrid.js" "/js/my-list-page.js" 
+               )
+   [:table#jqGrid1]
+   [:div#jqGrid1-Pager]
+   [:script
+    (str "buildLocalTable('jqGrid1'," (json/write-str {:caption "测试"}) ")")]
+   ])
+
 ;数节点模型模板，id必须为string类型
 (def nodeTemplate {:id "0",:text "root",:value "86",:showcheck true,:complete true,:isexpand true ,:checkstate  0 ,:hasChildren true})
+;部门树结构
 (def departmentTree [(merge nodeTemplate {:ChildNodes [(merge nodeTemplate {:id "1" :text "软件部" :hasChildren false })] :text "所有部门"})])
 (defn comp-page
   [request]
@@ -220,20 +235,21 @@
                                              ]})) {entity :params} request]
     (html5 [:head 
             (include-css "/bootstrap/css/bootstrap.min.css" "/css/jquery-ui.css" "/css/styles.css" "/css/buttons.css" 
-                         "/css/my-form.css")]
+                         "/css/my-form.css")
+            (include-js "/js/jquery.js" "/js/jquery-ui.js"  "/bootstrap/js/bootstrap.min.js" )]
            [:body
             comp-header 
             [:div.page-content
              [:div.row
               comp-left-menu 
               [:div.col-md-10
-               (bt-form form)
+               ;(bt-form form)
+               (comp-list-page)
                [:div.row
                 ]]
               ]
              ]
-            (include-js "/js/jquery.js" "/js/jquery-ui.js"  "/bootstrap/js/bootstrap.min.js" "js/custom.js" "js/my-form.js" 
-                        "/vendors/wdTree/src/Plugins/jquery.tree.js" "/vendors/wdTree/data/tree1.js")
+            (include-js  "js/custom.js" )
             [:script 
              (str
                "$(function(){"
@@ -241,11 +257,7 @@
                "buildCategoryAutoComplete(" (json/write-str [{:name "a" :value "A" :label "MA脏" :category "ABC"} {:name "b" :value "B" :label "MB" :category "AB"} {:name "c" :value "C" :label "MC" :category "ABC"}]) "," (json/write-str {:valueField "name" :elementId "address"} ) ");"
 
                "});"
-               )
-             ]
-            ]) 
-    )
-  )
+               )]])))
 
 (defn form
   []
@@ -262,6 +274,5 @@
                     ))
 ;(use 'pl.danieljanus.tagsoup)
 ;(parse "file:///z/workspace/clojure/b2/resources/public/temp.html")
-
 
 

@@ -4,6 +4,7 @@
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [compojure "1.3.1"]
+                 [resourceful "0.1.1"];restful
                  [ring-auth "0.1.0"]
                  [ring/ring-defaults "0.1.2"]
                  ;;以下为数据库相关

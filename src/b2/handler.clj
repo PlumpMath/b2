@@ -8,6 +8,7 @@
         )
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
+            [resourceful :refer [resource]]
             [b2.index ]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
             )
@@ -30,6 +31,13 @@
 
 (defroutes app-routes
   ;(GET "/" [] (b2.index/index))
+  (resource "Collection of the books of an author"
+            "/authors/:author/books"
+            (GET [author]
+                 (str author))
+            (POST [author title]
+                  (str author)
+                  (str author)))
   (GET "/" request [name] (str request name))
   (GET "/sayHello"  [name sex ]  (str  name sex))
   (GET "/req"  request  (str  request))
