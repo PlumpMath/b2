@@ -138,20 +138,27 @@
 ;左侧菜单
 (def comp-left-menu
   [:div {:class "col-md-2"} 
-   [:div {:class "sidebar content-box", :style "display: block;"} 
-    [:ul {:class "nav"} 
-     [:li {:class "current"} [:a {:shape "rect", :href "index.html"} 
-                              [:i {:class "glyphicon glyphicon-home"}] " Dashboard"]]
-     [:li {} [:a {:shape "rect", :href "calendar.html"} [:i {:class "glyphicon glyphicon-calendar"}] " Calendar"]]
-     [:li {} [:a {:shape "rect", :href "stats.html"} 
-              [:i {:class "glyphicon glyphicon-stats"}] " Statistics (Charts)"]]
-     [:li {} [:a {:shape "rect", :href "tables.html"} [:i {:class "glyphicon glyphicon-list"}] " Tables"]] 
-     [:li {} [:a {:shape "rect", :href "buttons.html"} [:i {:class "glyphicon glyphicon-record"}] " Buttons"]] 
-     [:li {} [:a {:shape "rect", :href "editors.html"} [:i {:class "glyphicon glyphicon-pencil"}] " 添加用户"]] 
-     [:li {} [:a {:shape "rect", :href "forms.html"} [:i {:class "glyphicon glyphicon-tasks"}] " 查询用户"]] 
-     [:li {:class "submenu"} [:a {:shape "rect", :href "#"} [:i {:class "glyphicon glyphicon-list"}] "报表统计" [:span {:class "caret pull-right"}]] 
-      [:ul {} [:li {} [:a {:shape "rect", :href "login.html"} "Login"]] 
-       [:li {} [:a {:shape "rect", :href "signup.html"} "Signup"]]]]]]]
+   ;; [:div {:class "sidebar content-box", :style "display: block;"} 
+   ;;  [:ul {:class "nav"} 
+   ;;   [:li {:class "current"} [:a {:shape "rect", :href "index.html"} 
+   ;;                            [:i {:class "glyphicon glyphicon-home"}] " Dashboard"]]
+   ;;   [:li {} [:a {:shape "rect", :href "calendar.html"} [:i {:class "glyphicon glyphicon-calendar"}] " Calendar"]]
+   ;;   [:li {} [:a {:shape "rect", :href "stats.html"} 
+   ;;            [:i {:class "glyphicon glyphicon-stats"}] " Statistics (Charts)"]]
+   ;;   [:li {} [:a {:shape "rect", :href "tables.html"} [:i {:class "glyphicon glyphicon-list"}] " Tables"]] 
+   ;;   [:li {} [:a {:shape "rect", :href "buttons.html"} [:i {:class "glyphicon glyphicon-record"}] " Buttons"]] 
+   ;;   [:li {} [:a {:shape "rect", :href "editors.html"} [:i {:class "glyphicon glyphicon-pencil"}] " 添加用户"]] 
+   ;;   [:li {} [:a {:shape "rect", :href "forms.html"} [:i {:class "glyphicon glyphicon-tasks"}] " 查询用户"]] 
+   ;;   [:li {:class "submenu"} [:a {:shape "rect", :href "#"} [:i {:class "glyphicon glyphicon-list"}] "报表统计" [:span {:class "caret pull-right"}]] 
+   ;;    [:ul {} [:li {} [:a {:shape "rect", :href "login.html"} "Login"]] 
+   ;;     [:li {} [:a {:shape "rect", :href "signup.html"} "Signup"]]]]]]
+   [:div#accordion-menu
+    [:h3 "基本信息"]
+    [:div "内容1"]
+    [:h3 "订单信息"]
+    [:div "内容2"]]
+   [:script "$( '#accordion-menu' ).accordion();"]
+   ]
   )
 
 
@@ -211,14 +218,19 @@
   )
 (defn comp-list-page
   []
-  [:div 
-   (include-css "/vendors/jqGrid/css/ui.jqgrid.css")
+  [:div.jq-ui 
+   (include-css "/vendors/jqGrid/css/ui.jqgrid.css"
+                ;"/vendors/jqGrid/css/ui.jqgrid-bootstrap-ui.css"
+                ;"/vendors/jqGrid/css/ui.jqgrid-bootstrap.css" 
+                )
    (include-js  "/vendors/jqGrid/js/i18n/grid.locale-cn.js" "/vendors/jqGrid/js/jquery.jqGrid.js" "/js/my-list-page.js" 
                )
+   [:style "div[class*='ui'], a[class*='ui']{box-sizing: content-box} "]
    [:table#jqGrid1]
    [:div#jqGrid1-Pager]
    [:script
-    (str "buildLocalTable('jqGrid1'," (json/write-str {:caption "测试"}) ")")]
+    (str "buildRemoteTable('jqGrid1'," (json/write-str {:caption "测试"}) ")")]
+   [:button {:onclick "$('jqGrid1').jqGrid('options','loadonce',true)"} "测试"]
    ])
 
 ;数节点模型模板，id必须为string类型
@@ -234,7 +246,15 @@
                                              {:name "sex" :label "性别：" :render field-tree-dlg :data departmentTree} {:name "address" :label "地址："  }
                                              ]})) {entity :params} request]
     (html5 [:head 
-            (include-css "/bootstrap/css/bootstrap.min.css" "/css/jquery-ui.css" "/css/styles.css" "/css/buttons.css" 
+            (include-css 
+                        ; "/css/jquery-ui.css" 
+                        ; "http://www.guriddo.net/demo/css/jquery-ui.css"
+             ; "/css/ui/1.11.4/themes/Cupertino/jquery-ui.css"
+              ;"/css/ui/1.11.4/themes/Flick/jquery-ui.css"
+              "http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"
+              "/bootstrap/css/bootstrap.min.css" 
+                         "/css/styles.css" 
+                         "/css/buttons.css" 
                          "/css/my-form.css")
             (include-js "/js/jquery.js" "/js/jquery-ui.js"  "/bootstrap/js/bootstrap.min.js" )]
            [:body

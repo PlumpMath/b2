@@ -1,3 +1,48 @@
+function buildRemoteTable(elementId,config){
+	var mConfig = {
+		url:'/users',
+		mtype: "GET",
+		datatype: "json",
+		page: 1,
+		userData:{
+			"amount" : "233"
+		},
+		height: 400,
+		//width: 800,
+		autowidth:true,
+		rownumbers: true,
+		colModel: [
+			{ label: '姓名', name: 'name', width: 90 },
+			{ label: '性别', name: 'sex', width: 90 },
+								],
+								viewrecords: true, 
+								loadonce: true,
+								// show the current page, data rang and total records on the toolbar
+								caption: "Load jqGrid through Javascript Array",
+								pager: "#"+elementId+"-Pager",
+								footerrow: true, // set a footer row
+								userDataOnFooter: true, // the calculated sums and/or strings from server are put at footer row.
+	};
+	$.extend(mConfig,config);
+	
+	var grid = jQuery("#"+elementId).jqGrid(mConfig); 
+	grid.jqGrid('filterToolbar',{
+			//stringResult: true,
+			search: true, // show search button on the toolbar
+			add: false,
+			edit: false,
+			del: false,
+			refresh: true
+	});
+	$("#"+elementId).navGrid("#"+elementId+"-Pager", {                
+			search: true, // show search button on the toolbar
+			add: false,
+			edit: false,
+			del: false,
+			refresh: true
+	});
+}
+
 function buildLocalTable(elementId,config){
 	var mConfig = {
 		datatype: "local",

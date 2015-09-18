@@ -9,6 +9,7 @@
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
             [resourceful :refer [resource]]
+            [clojure.data.json :as json]
             [b2.index ]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
             )
@@ -22,12 +23,11 @@
 ;认证管理中间件
 (defn wrap-my-auth [handler]
   (fn [request]
-    (prn ":::" request)
+    ;(prn ":::" request)
     (if (authorized? request)
       (handler request)
       (-> (response "Access Denied")
           (status 403)))))
-
 
 (defroutes app-routes
   ;(GET "/" [] (b2.index/index))
@@ -38,6 +38,35 @@
             (POST [author title]
                   (str author)
                   (str author)))
+  (resource "用户管理web api"
+            "/users/:user"
+            ;get
+            (GET [user ]
+                 (str user ))
+            ;delete
+            (DELETE [user ]
+                 (str user ))
+            ;partial update
+            (PATCH [user title]
+                 (str user)
+                 (str user))
+            ;update
+            (PUT [user title]
+                  (str user)
+                  (str user)))
+  (resource "用户管理web api"
+            "/users"
+            ;list
+            (GET [page page-size]
+                 (json/write-str {:total 1000 :page 2 :rows (into [
+                                                             {:id 1 :name "im" :sex "男"}
+                                                             {:id 2 :name "李四" :sex "女"}
+                                                             {:id 4 :name "张三" :sex "男"}]
+                                                                  (for [x (range 100)] {:id x :name (str "name" x) :sex "mail"}))  }))
+            ;create
+            (POST [user title]
+                 (str user)
+                 (str user)))
   (GET "/" request [name] (str request name))
   (GET "/sayHello"  [name sex ]  (str  name sex))
   (GET "/req"  request  (str  request))
@@ -65,5 +94,5 @@
                    ;(wrap-auth-session )
                    ;(wrap-session )
                    ;(wrap-cookies )
-                   ;(wrap-my-auth) 
+                   (wrap-my-auth) 
                    ) (assoc-in site-defaults [:security :anti-forgery] true)))
