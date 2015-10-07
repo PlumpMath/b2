@@ -64,14 +64,14 @@
                                                              {:id 4 :name "张三" :sex "男"}]
                                                                   (for [x (range 100)] {:id x :name (str "name" x) :sex "mail"}))  }))
             ;create
-            (POST [user title]
-                 (str user)
-                 (str user)))
+            (POST [name sex]
+                 (prn name sex)
+                 (json/write-str {:name name :sex sex})))
   (GET "/" request [name] (str request name))
   (GET "/sayHello"  [name sex ]  (str  name sex))
-  (GET "/req"  request  (str  request))
+  (GET "/req"  request  (b2.index/comp-page request))
   (GET "/resp"  request  (response "tttt"))
-  (ANY "/form"  request  (prn request) (b2.index/comp-page request))
+  (ANY "/form"  request   (b2.index/comp-page request))
   (ANY "/session"  
        {session :session}
        (if (:my-var session)

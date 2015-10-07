@@ -18,6 +18,7 @@
            ; as driver-specific properties.
            :user     "sa"
            :password ""}))
+
 ;HTML组件
 (defn comp_box 
   [item]
@@ -92,16 +93,16 @@
   )
 ;3列的表单
 (defn col3-form [entity]
-  [:form {:method "post" :action ""} 
+  [:form {:method "post" :action "" :id "entityForm" } 
    [:input {:type "hidden" :name "__anti-forgery-token" :value anti-forgery/*anti-forgery-token*}]
-   [:table
+   [:table  
     (row3-row (:fields (meta entity) entity) entity)
     [:tr 
      [:table
       [:td
        [:p
-        [:button {:type "submit", :class "btn btn-info"} [:i {:class "glyphicon glyphicon-refresh"}] " 保存"]
-        [:button {:type "submit", :class "btn btn-danger"} [:i {:class "glyphicon glyphicon-remove"}] " 删除"]
+        ;[:button {:type "submit", :class "btn btn-info"} [:i {:class "glyphicon glyphicon-refresh"}] " 保存"]
+        ;[:button {:type "submit", :class "btn btn-danger"} [:i {:class "glyphicon glyphicon-remove"}] " 删除"]
         ] 
        ]
       [:td
@@ -154,8 +155,12 @@
    ;;     [:li {} [:a {:shape "rect", :href "signup.html"} "Signup"]]]]]]
    [:div#accordion-menu
     [:h3 "基本信息"]
-    [:div "内容1"]
+    [:div [:ul#menu-1 [:li [:span.ui-icon.ui-icon-disk] "用户信息 "]
+           [:li [:span.ui-icon.ui-icon-zoomin] "添加用户 "]
+           [:li [:span.ui-icon.ui-icon-zoomin] "添加角色 "][:li [:span.ui-icon.ui-icon-zoomin] "角色信息 "]]
+     [:script  "$( '#menu-1' ).menu();"]]
     [:h3 "订单信息"]
+    [:div "内容2"][:h3 "报表统计"]
     [:div "内容2"]]
    [:script "$( '#accordion-menu' ).accordion();"]
    ]
@@ -170,13 +175,11 @@
      (include-css "/vendors/wdTree/css/tree.css")
      [:input {:style "width:100%" :type "text2" :name (:name field) :value ((keyword (:name field)) entity) :id (:name field)}
       ]
-     [:button {:style "position:absolute; width:0px; height:25px;top:0px;right:0px;z-index:1;" :class "btn btn-danger"
+     [:button {:style "position:absolute;padding:0px;margin:0px;box-sizing:border-box; width:20px; height:22px;top:0px;right:0px;z-index:1;" :class "btn btn-danger"
                :onclick (str "buildSingleSelectTreeField('" (:name field) "'," (json/write-str data) ");return false") :type "button" :role "button"} ]
      [:div {:style "display:none" :id elementId :title "测试"} 
       content
-      ]
-     ])
-  )
+      ]]))
 ;树对话框字段
 (defn field-tree-dlg
   [field entity]
@@ -188,9 +191,7 @@
   [field entity]
   [:select.field-comm {:id (:name field) :name (:name field)}
     [:option {:value "hahah"} "hahd总ah"] 
-    [:option {:value "中"} "hahah"] 
-   ]
-  )
+    [:option {:value "中"} "hahah"]])
 (defn field-autocomplete
   [field entity]
   (let [data (:data field []) ]
@@ -208,6 +209,9 @@
       item] 
     )
   )
+
+
+
 
 (defn field-password
  [field entity] 
@@ -229,14 +233,30 @@
    [:table#jqGrid1]
    [:div#jqGrid1-Pager]
    [:script
-    (str "buildRemoteTable('jqGrid1'," (json/write-str {:caption "测试"}) ")")]
+    (str "buildRemoteTable('jqGrid1'," (json/write-str {:caption "用户信息"}) ")")]
    [:button {:onclick "$('jqGrid1').jqGrid('options','loadonce',true)"} "测试"]
    ])
 
 ;数节点模型模板，id必须为string类型
 (def nodeTemplate {:id "0",:text "root",:value "86",:showcheck true,:complete true,:isexpand true ,:checkstate  0 ,:hasChildren true})
 ;部门树结构
-(def departmentTree [(merge nodeTemplate {:ChildNodes [(merge nodeTemplate {:id "1" :text "软件部" :hasChildren false })] :text "所有部门"})])
+(def departmentTree [(merge nodeTemplate {:ChildNodes [(merge nodeTemplate  {:id "2" :text "财务部" :hasChildren false }) (merge nodeTemplate  {:id "1" :text "软件部" :hasChildren false })] :text "所有部门"})])
+
+(defn  toolbar [entity]
+  [:div [:div {:class "ui-widget-header " :style "border:0px;background:#ccc"}
+         [:div#entity-toolbar.btn-group [:button {:class "save-btn "}  "保存" ] [:button {:class "print-btn"} "打印"] [:button "导入"] [:button "导出"]] 
+         ]
+   [:script "initToolbar({})"]])
+(defn ui-form [form entity]
+  [:div {:class "ui-dialog ui-widget" :style "width:98%;display:inline-block;z-index:0"}
+   (include-js   "js/my-form.js" 
+               "/vendors/wdTree/src/Plugins/jquery.tree.js" "/vendors/wdTree/data/tree1.js")
+   [:style "div[class*='ui'], a[class*='ui'],button[class*='ui']{box-sizing: content-box} "]
+   [:div {:class "ui-dialog-titlebar ui-widget-header ui-helper-clearfix"} [:span {:class "ui-dialog-title"} "标题"]]
+  (toolbar entity)
+   [:div {:style "padding:10px;background-color:white"} 
+    form 
+   ]])
 (defn comp-page
   [request]
   (let [form (col3-form (with-meta (:params request) 
@@ -251,12 +271,12 @@
                         ; "http://www.guriddo.net/demo/css/jquery-ui.css"
              ; "/css/ui/1.11.4/themes/Cupertino/jquery-ui.css"
               ;"/css/ui/1.11.4/themes/Flick/jquery-ui.css"
-              "http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"
               "/bootstrap/css/bootstrap.min.css" 
+              "http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"
                          "/css/styles.css" 
                          "/css/buttons.css" 
                          "/css/my-form.css")
-            (include-js "/js/jquery.js" "/js/jquery-ui.js"  "/bootstrap/js/bootstrap.min.js" )]
+            (include-js  "/js/jquery.js" "/bootstrap/js/bootstrap.min.js"  "/js/jquery-ui.js"   )]
            [:body
             comp-header 
             [:div.page-content
@@ -264,11 +284,13 @@
               comp-left-menu 
               [:div.col-md-10
                ;(bt-form form)
-               (comp-list-page)
+               ;(comp-list-page)
                [:div.row
-                ]]
-              ]
-             ]
+                (ui-form form {})
+                ] [:div.row
+                (include-js "/js/main-frame.js")
+                [:iframe {:width "100%" :height "100px" :id "dlgFrame"  :frameborder "0" :src "/req" :onload "fixFrameSize(this)"}]
+                ]]]]
             (include-js  "js/custom.js" )
             [:script 
              (str
@@ -287,11 +309,7 @@
          [:body
           [:form
            [:input {:type "text" :name ":name" :value "上"}]
-           [:input {:type "submit" :value "btn"}]
-           
-           ]
-          ]
-                    ))
+           [:input {:type "submit" :value "btn"}]]]))
 ;(use 'pl.danieljanus.tagsoup)
 ;(parse "file:///z/workspace/clojure/b2/resources/public/temp.html")
 

@@ -7,7 +7,7 @@ function buildRemoteTable(elementId,config){
 		userData:{
 			"amount" : "233"
 		},
-		height: 400,
+		height: 470,
 		//width: 800,
 		autowidth:true,
 		rownumbers: true,

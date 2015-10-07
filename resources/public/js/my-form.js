@@ -223,3 +223,33 @@ function buildCategoryDlg(elementId,config){
 	return datepicker.regional['zh-CN'];
 
 }));
+
+function initToolbar(config){
+	$('.btn-group').buttonset();
+	$('.btn-group .save-btn').button({
+			icons: {
+				primary: "ui-icon-disk"
+	}});
+	$('.btn-group .print-btn').button({
+			icons: {
+				primary: "ui-icon-print"
+	}});
+	var defaults = {
+		entityName : "",
+		elementId : "entity-toolbar"
+	};
+	$("#"+defaults['elementId']+" button").click(function(){
+		var formParam = $("#entityForm").serialize();
+		$.ajax({  
+				type:'post',      
+				url:'/users',  
+				data:formParam,  
+				cache:false,  
+				dataType:'json',  
+				success:function(data){  
+					alert(data);
+				}  
+		});  
+	});
+
+}
